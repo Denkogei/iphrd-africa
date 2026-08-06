@@ -1,0 +1,30 @@
+// src/pages/YoungWomenLeaders.jsx
+const YoungWomenLeaders = () => {
+  return (
+    <div className="bg-white">
+      {/* Hero Section */}
+      <section className="bg-gradient-to-r from-iphrd-green to-green-700 py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="inline-block px-4 py-1.5 bg-white/20 backdrop-blur-sm rounded-full mb-5">
+            <span className="text-white text-xs font-medium">Women Empowerment</span>
+          </div>
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">YOUNG WOMEN LEADERS MEDIATION PROJECT</h1>
+          <div className="w-20 h-0.5 bg-white mx-auto"></div>
+        </div>
+      </section>
+
+      {/* Content */}
+      <section className="py-12">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+            <p className="text-gray-700 leading-relaxed">
+              IPHRD-Africa is implementing a project that seeks to build and enhance the mediation capacities of young women leaders in the great lakes and horn of Africa.
+            </p>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default YoungWomenLeaders;
