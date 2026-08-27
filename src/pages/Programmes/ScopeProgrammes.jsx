@@ -4,6 +4,41 @@ import { Shield, Heart, Leaf, Users, BookOpen, Building2 } from 'lucide-react';
 const ScopeProgrammes = () => {
   const programmes = [
     {
+      title: 'Peace and Security Programme (PSP)',
+      icon: Shield,
+      subProgrammes: [
+        {
+          title: 'Young Women Leaders Mediation Programme',
+          subProgrammes: [
+            'Young Women Mediation Network'
+          ]
+        },
+        {
+          title: 'Young African Peacemakers Programme',
+          subProgrammes: [
+            'Young Citizens Journalist Project'
+          ]
+        },
+        {
+          title: 'The Youth Peace Index',
+          subProgrammes: []
+        },
+        {
+          title: 'Other Programs',
+          subProgrammes: [
+            'Peacebuilding and Post Conflict Reconstruction Initiative',
+            'Crime and Violence Prevention Initiative',
+            'Prevention of Violence Towards Children Initiative',
+            'Social Cohesion and Non-violent Communication Initiative',
+            'Peace Operations and Humanitarian Assistance Initiative',
+            'Countering Violent Extremism Initiative',
+            'Media and Peace Initiative',
+            'Migration and Conflict Initiative'
+          ]
+        }
+      ]
+    },
+    {
       title: 'Community Empowerment and Development Programme (CEDP)',
       icon: Users,
       subProgrammes: [
@@ -14,22 +49,7 @@ const ScopeProgrammes = () => {
         'Citizen Journalism Initiative'
       ]
     },
-    {
-      title: 'Peace and Security Programme (PSP)',
-      icon: Shield,
-      subProgrammes: [
-        'Conflict Prevention and Resolution Initiative',
-        'Peacebuilding and Post Conflict Reconstruction Initiative',
-        'Crime and Violence Prevention Initiative',
-        'Women, Peace and Security Initiative',
-        'Prevention of Violence Towards Children Initiative',
-        'Social Cohesion and Non-violent Communication Initiative',
-        'Peace Operations and Humanitarian Assistance Initiative',
-        'Countering Violent Extremism Initiative',
-        'Media and Peace Initiative',
-        'Migration and Conflict Initiative'
-      ]
-    },
+    
     {
       title: 'Human Rights and Development Programme (HRDP)',
       icon: Heart,
@@ -108,7 +128,7 @@ const ScopeProgrammes = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-6">
             {programmes.map((programme, index) => (
-              <div key={index} className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition">
+              <div key={index} className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition h-fit">
                 <div className="p-6">
                   <div className="flex items-start gap-4 mb-4">
                     <div className="w-12 h-12 bg-iphrd-green/10 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -127,12 +147,41 @@ const ScopeProgrammes = () => {
                     <div className="mt-4">
                       <h4 className="text-sm font-semibold text-gray-700 mb-3">Sub-programmes include:</h4>
                       <div className="grid grid-cols-1 gap-2">
-                        {programme.subProgrammes.map((item, idx) => (
-                          <div key={idx} className="flex items-start gap-2">
-                            <div className="w-1.5 h-1.5 bg-iphrd-green rounded-full mt-2"></div>
-                            <span className="text-sm text-gray-600 text-justify">{item}</span>
-                          </div>
-                        ))}
+                        {programme.subProgrammes.map((item, idx) => {
+                          if (typeof item === 'string') {
+                            return (
+                              <div key={idx} className="flex items-start gap-2">
+                                <div className="w-1.5 h-1.5 bg-iphrd-green rounded-full mt-2 flex-shrink-0"></div>
+                                <span className="text-sm text-gray-600 text-justify">{item}</span>
+                              </div>
+                            );
+                          } else if (typeof item === 'object' && item.title) {
+                            return (
+                              <div key={idx}>
+                                <div className="flex items-start gap-2">
+                                  <div className="w-1.5 h-1.5 bg-iphrd-green rounded-full mt-2 flex-shrink-0"></div>
+                                  <span className="text-sm text-gray-600 text-justify">{item.title}</span>
+                                </div>
+                                {item.subProgrammes && item.subProgrammes.length > 0 && (
+                                  <div className="ml-6 space-y-2 mt-1">
+                                    {item.subProgrammes.map((subItem, subIdx) => {
+                                      if (typeof subItem === 'string') {
+                                        return (
+                                          <div key={subIdx} className="flex items-start gap-2">
+                                            <span className="text-iphrd-green font-bold text-sm flex-shrink-0">✓</span>
+                                            <span className="text-sm text-gray-600 text-justify">{subItem}</span>
+                                          </div>
+                                        );
+                                      }
+                                      return null;
+                                    })}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          }
+                          return null;
+                        })}
                       </div>
                     </div>
                   )}

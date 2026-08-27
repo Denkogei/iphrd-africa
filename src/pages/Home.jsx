@@ -114,7 +114,7 @@ const Hero = () => {
   const slides = [
     {
       image: heroImage5,
-      subtitle: "Strengthened Feminist Leadership and Activism",
+      subtitle: "Women peace and security",
       ctaText: "Read More",
       ctaLink: "/young-african-peacemakers",
       ctaSecondary: "Be Involved",
@@ -123,7 +123,7 @@ const Hero = () => {
     },
     {
       image: heroImage4,
-      subtitle: "Strengthened Feminist Economics",
+      subtitle: "Community Development Dialogue & Social cohesion ",
       ctaText: "Read More",
       ctaLink: "/who-we-are",
       ctaSecondary: "Be Involved",
@@ -132,7 +132,7 @@ const Hero = () => {
     },
     {
       image: heroImage6,
-      subtitle: "Inclusive Governance for All",
+      subtitle: "Human- Rights Based Development Governance and Citizen Engagement",
       ctaText: "Read More",
       ctaLink: "/objectives",
       ctaSecondary: "Be Involved",
@@ -141,7 +141,7 @@ const Hero = () => {
     },
     {
       image: heroImage7,
-      subtitle: "Human Rights Protection Across Africa",
+      subtitle: "Policy  Engagement and Advocacy ",
       ctaText: "Read More",
       ctaLink: "/vision-mission",
       ctaSecondary: "Be Involved",
@@ -150,7 +150,7 @@ const Hero = () => {
     },
     {
       image: heroImage8,
-      subtitle: "Strengthening Peacebuilding Capacities",
+      subtitle: "Mental Wellness and Psychosocial wellbeing",
       ctaText: "Read More",
       ctaLink: "/scope-programmes",
       ctaSecondary: "Be Involved",
@@ -339,7 +339,7 @@ const Home = () => {
         IPHRD-Africa is committed to supporting the achievement of Sustainable Developments Goals (SDGs), the African Union's Agenda 2063 and Kenya's Vision 2030 thus accelerating poverty reduction, and strengthening post conflict reconstruction and development while incorporating a human rights approach.{' '}
       </p>
       <p className="inline">
-        The strategic direction of the organization will be achieved by building on existing strengths, capacities and on-going programmes as well as exploring new opportunities and programmes.{' '}
+        The strategic direction of the organization will be achieved by building on existing strengths, capacities and on-going programmes as well asn exploring new opportunities and programmes.{' '}
       </p>
       <p className="inline">
         The organization's work is designed to positively transform socio-economic structures in order to reduce poverty and violence among people and above all promote <span className="text-white font-semibold">human rights, justice, peace and sustainable development</span>.{' '}

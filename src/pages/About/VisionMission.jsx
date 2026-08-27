@@ -6,7 +6,7 @@ const VisionMission = () => {
     { title: "Integrity", description: "Upholding honesty, transparency, and ethical conduct in all our endeavors.", icon: "💎" },
     { title: "Professionalism", description: "Maintaining the highest standards of excellence and competence in our work.", icon: "🎯" },
     { title: "Respect", description: "Valuing diverse perspectives and treating all individuals with dignity and respect.", icon: "🤝" },
-    { title: "Transparency", description: "Operating with openness, accountability, and clear communication.", icon: "🔍" }
+    { title: "Transparency & Accountability", description: "Operating with openness, accountability, and clear communication.", icon: "🔍" }
   ];
 
   const principles = [
@@ -39,7 +39,7 @@ const VisionMission = () => {
               <h2 className="text-2xl font-bold text-gray-900 mb-3">Our Vision</h2>
               <div className="w-12 h-0.5 bg-iphrd-green mb-5"></div>
               <p className="text-gray-600 leading-relaxed text-justify">
-                To contribute to peaceful coexistence of all groups within the communities through promotion of human rights based approach for sustainable peace and development.
+                To be a Centre of Excellence in enhancing and promoting social cohesion, conflict prevention, resolution and management, building sustainable peace and in establishing a conducive environment for achieving sustainable development through a human rights based approach.
               </p>
             </div>
             <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
@@ -49,7 +49,7 @@ const VisionMission = () => {
               <h2 className="text-2xl font-bold text-gray-900 mb-3">Our Mission</h2>
               <div className="w-12 h-0.5 bg-iphrd-green mb-5"></div>
               <p className="text-gray-600 leading-relaxed text-justify">
-                To be a Centre of Excellence in enhancing and promoting social cohesion, conflict prevention, resolution and management, building sustainable peace and in establishing a conducive environment for achieving sustainable development through a human rights based approach.
+                To contribute to peaceful coexistence of all groups within the communities through promotion of human rights based approach for sustainable peace and development.
               </p>
             </div>
           </div>

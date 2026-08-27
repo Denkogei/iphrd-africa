@@ -15,25 +15,25 @@ const BoardOfDirectors = () => {
       image: sylviaImg
     },
     {
-      name: "Susan Wamalwa",
-      role: "Secretary, Board of Directors",
-      image: susanImg
-    },
-    {
       name: "Thomson Muthama",
-      role: "Treasurer",
+      role: "Treasurer Board of Directors",
       image: thomsonImg
     },
     {
       name: "Jeff Murgor",
-      role: "Member",
+      role: "Member Board of Directors",
       image: jeffImg
     },
     {
       name: "Caroline Kendagor",
-      role: "Member",
+      role: "Member Board of Directors",
       image: carolineImg
-    }
+    },
+    {
+      name: "Susan Wamalwa",
+      role: "Secretary, Board of Directors",
+      image: susanImg
+    },
   ];
 
   return (
@@ -52,7 +52,7 @@ const BoardOfDirectors = () => {
       {/* Introduction Section */}
       <section className="bg-white py-12">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-gray-600 text-sm leading-relaxed text-center text-justify">
+          <p className="text-gray-600 text-sm leading-relaxed text-justify">
             IPHRD-Africa has a strong governance structure that is accountable with an independent Board of Directors consisting of seasoned experts in the various thematic areas implemented by the organization. The Board is tasked with providing strategic direction, policy guidance and professional support to the organization. It is the highest decision-making body of the organization and plays a key role in defining IPHRD-Africa's overall strategy. The Board comprises of the following members
           </p>
         </div>

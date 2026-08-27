@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import wanjikuImage from '../../assets/images/team/wanjiku-kamau.jpg';
 import emanuelImage from '../../assets/images/team/emanuel-luanda.jpg';
 import dennisImage from '../../assets/images/team/dennis-kemboi.png';
+import carlosImage from '../../assets/images/team/carlos.jpg';
 
 const OurTeam = () => {
   return (
@@ -71,14 +72,21 @@ const teamMembers = [
     image: emanuelImage,
     name: "Emanuel Luanda",
     position: "Programs Officer",
-    bio: "Dedicated programs officer with expertise in project coordination, monitoring, and evaluation. Committed to promoting human rights and social justice in communities across the region."
+    bio: "Emanuel Lwanda is a programs officer at IPHRD-Africa. Previously, he served as a programme facilitator at the National Federation of Public Benefit Organizations and as an internship trainee at the Eastern Africa Standby Force (EASF). He began as an attachee at the National Federation of PBOs. He holds a Bachelor of Arts in International Relations and Diplomacy from Zetech University."
   },
   {
     icon: "👨‍💻",
     image: dennisImage,
     name: "Dennis Kemboi",
     position: "IT & Communications",
-    bio: "IT and communications specialist responsible for digital strategy, technology infrastructure, and information management. Passionate about leveraging technology for social impact."
+    bio: "Dennis Kemboi is an IT and communications professional at IPHRD-Africa, supporting the organization’s digital strategy, technology systems, website management, and communications. He is passionate about using technology and digital innovation to strengthen organizational impact, improve information management, and support peacebuilding, human rights, and sustainable development initiatives across Africa."
+  },
+  {
+    icon: "👨‍💻",
+    image: carlosImage,
+    name: "Carlos Kipchumba",
+    position: "Programs Officer",
+    bio: "Development professional focused on gender equality, human rights, peacebuilding, and youth empowerment. Passionate about supporting inclusive communities and strengthening locally driven approaches to peace, development, and social justice across Africa"
   }
 ];
 

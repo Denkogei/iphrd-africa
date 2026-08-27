@@ -29,6 +29,7 @@ const Navbar = () => {
   const dropdownRefs = useRef({});
   const mobileMenuRef = useRef(null);
   const isMobile = useRef(window.innerWidth < 768);
+  const hoverTimeout = useRef(null);
 
   // Handle resize
   useEffect(() => {
@@ -129,17 +130,40 @@ const Navbar = () => {
     { name: "Contacts", path: "/contacts", hasDropdown: false }
   ];
 
-  // Desktop dropdown handlers
+  // Desktop dropdown handlers with delay
   const handleMouseEnter = (dropdownKey) => {
     if (!isMobile.current) {
+      // Clear any pending close timeout
+      if (hoverTimeout.current) {
+        clearTimeout(hoverTimeout.current);
+        hoverTimeout.current = null;
+      }
       setOpenDropdown(dropdownKey);
     }
   };
 
   const handleMouseLeave = () => {
     if (!isMobile.current) {
-      setOpenDropdown(null);
+      // Add a small delay before closing to allow moving to dropdown
+      hoverTimeout.current = setTimeout(() => {
+        setOpenDropdown(null);
+      }, 150);
     }
+  };
+
+  const handleDropdownMouseEnter = () => {
+    // Clear the close timeout when entering the dropdown
+    if (hoverTimeout.current) {
+      clearTimeout(hoverTimeout.current);
+      hoverTimeout.current = null;
+    }
+  };
+
+  const handleDropdownMouseLeave = () => {
+    // Close dropdown when leaving
+    hoverTimeout.current = setTimeout(() => {
+      setOpenDropdown(null);
+    }, 150);
   };
 
   return (
@@ -220,7 +244,11 @@ const Navbar = () => {
                         <ChevronDown className={`ml-0.5 h-3 w-3 transition-transform duration-200 ${openDropdown === link.dropdownKey ? 'rotate-180' : ''}`} />
                       </button>
                       {openDropdown === link.dropdownKey && (
-                        <div className="absolute top-full left-0 mt-1 w-56 bg-white rounded-lg shadow-xl py-2 z-50 border border-gray-200">
+                        <div 
+                          className="absolute top-full left-0 mt-0 w-56 bg-white rounded-lg shadow-xl py-2 z-50 border border-gray-200"
+                          onMouseEnter={handleDropdownMouseEnter}
+                          onMouseLeave={handleDropdownMouseLeave}
+                        >
                           {dropdowns[link.dropdownKey].links.map((subLink) => (
                             subLink.external ? (
                               <a
@@ -271,7 +299,7 @@ const Navbar = () => {
             </div>
           </div>
 
-          {/* Mobile Navigation - No duplicate Donate button */}
+          {/* Mobile Navigation */}
           {isMenuOpen && (
             <div 
               ref={mobileMenuRef}

@@ -177,7 +177,7 @@ const GalleryPage = () => {
       {/* Event Selection - Event Cards View */}
       {selectedEvent === 'all' ? (
         <div className="container mx-auto px-4 py-12">
-          <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">Our Events</h2>
+          <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">Our Gallery</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
             {events.map(event => (
               <motion.div
