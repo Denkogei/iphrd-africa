@@ -1,7 +1,7 @@
 // Navbar.jsx
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, ChevronDown, Mail, Phone, Facebook, Twitter, Linkedin, Youtube, Instagram } from 'lucide-react';
+import { Menu, X, ChevronDown, Mail, Phone, Facebook, Twitter, Linkedin, Youtube, Instagram, GraduationCap, Globe } from 'lucide-react';
 import logo from '../../assets/images/logo/iphrdlogo.jpeg';
 
 // ============================================
@@ -81,8 +81,9 @@ const Navbar = () => {
       links: [
         { name: "Who We Are", path: "/who-we-are" },
         { name: "Our Objectives", path: "/objectives" },
-        { name: "Board of Directors", path: "/board" },
         { name: "Vision, Mission & Core Values", path: "/vision-mission" },
+        { name: "Scope, Programmes & Projects", path: "/scope-programmes" },
+        { name: "Board of Directors", path: "/board" },
         { name: "Our Team", path: "/team" },
         { name: "Our Partners", path: "/partners" }
       ]
@@ -90,11 +91,11 @@ const Navbar = () => {
     programmes: {
       title: "Our Programmes",
       links: [
-        { name: "Scope, Programmes & Projects", path: "/scope-programmes" },
         { name: "Young Women Mediation Network", path: "https://ywm-network.iphrdafrica.org/", external: true },
         { name: "Young African Peacemakers Project", path: "/young-african-peacemakers" },
         { name: "Young Citizens Journalist Project", path: "/young-citizens-journalist" },
         { name: "Young Women Leaders Mediation Programme", path: "/young-women-leaders-mediation" },
+        { name: "Youth Peace Index", path: "/youth-peace-index" }
       ]
     },
     getInvolved: {
@@ -110,8 +111,7 @@ const Navbar = () => {
       links: [
         { name: "Global", path: "/engagements/global" },
         { name: "Regional", path: "/engagements/regional" },
-        { name: "National", path: "/engagements/national" },
-        { name: "Community", path: "/engagements/community" },
+        { name: "National and Community", path: "/engagements/national" },
       ]
     }
   };
@@ -126,6 +126,7 @@ const Navbar = () => {
     { name: "Gallery", path: "/media/gallery", hasDropdown: false }, 
     { name: "Our Events", path: "/media/our-events", hasDropdown: false },
     { name: "Blogs", path: "/media/blog", hasDropdown: false },
+    { name: "Publications", path: "/publications", hasDropdown: false },
     { name: "Complaints", path: "/complaints", hasDropdown: false },
     { name: "Contacts", path: "/contacts", hasDropdown: false }
   ];
@@ -133,7 +134,6 @@ const Navbar = () => {
   // Desktop dropdown handlers with delay
   const handleMouseEnter = (dropdownKey) => {
     if (!isMobile.current) {
-      // Clear any pending close timeout
       if (hoverTimeout.current) {
         clearTimeout(hoverTimeout.current);
         hoverTimeout.current = null;
@@ -144,7 +144,6 @@ const Navbar = () => {
 
   const handleMouseLeave = () => {
     if (!isMobile.current) {
-      // Add a small delay before closing to allow moving to dropdown
       hoverTimeout.current = setTimeout(() => {
         setOpenDropdown(null);
       }, 150);
@@ -152,7 +151,6 @@ const Navbar = () => {
   };
 
   const handleDropdownMouseEnter = () => {
-    // Clear the close timeout when entering the dropdown
     if (hoverTimeout.current) {
       clearTimeout(hoverTimeout.current);
       hoverTimeout.current = null;
@@ -160,7 +158,6 @@ const Navbar = () => {
   };
 
   const handleDropdownMouseLeave = () => {
-    // Close dropdown when leaving
     hoverTimeout.current = setTimeout(() => {
       setOpenDropdown(null);
     }, 150);
@@ -171,21 +168,35 @@ const Navbar = () => {
       {/* Top Strip - Always visible on all screen sizes */}
       <div className="bg-green-700 text-white py-2 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-0">
-          {/* Left: Contact Info */}
-          <div className="flex items-center gap-4 sm:gap-6 text-xs sm:text-sm">
-            <a href={`mailto:${CONTACT.email}`} className="flex items-center gap-1.5 sm:gap-2 hover:text-green-200 transition-colors">
-              <Mail className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+
+          {/* Mobile row 1: Contact Info */}
+          <div className="flex items-center justify-center gap-4 text-xs w-full sm:hidden">
+            <a href={`mailto:${CONTACT.email}`} className="flex items-center gap-1.5 hover:text-green-200 transition-colors">
+              <Mail className="w-3.5 h-3.5" />
               <span>{CONTACT.email}</span>
             </a>
-            <a href={`tel:${CONTACT.phone}`} className="flex items-center gap-1.5 sm:gap-2 hover:text-green-200 transition-colors">
-              <Phone className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <a href={`tel:${CONTACT.phone}`} className="flex items-center gap-1.5 hover:text-green-200 transition-colors">
+              <Phone className="w-3.5 h-3.5" />
               <span>{CONTACT.phone}</span>
             </a>
           </div>
 
-          {/* Right: Social Media & Donate */}
-          <div className="flex items-center gap-3 sm:gap-4">
-            <div className="flex items-center gap-1.5 sm:gap-2">
+          {/* Desktop: Contact Info (left) */}
+          <div className="hidden sm:flex items-center gap-6 text-sm">
+            <a href={`mailto:${CONTACT.email}`} className="flex items-center gap-2 hover:text-green-200 transition-colors">
+              <Mail className="w-4 h-4" />
+              <span>{CONTACT.email}</span>
+            </a>
+            <a href={`tel:${CONTACT.phone}`} className="flex items-center gap-2 hover:text-green-200 transition-colors">
+              <Phone className="w-4 h-4" />
+              <span>{CONTACT.phone}</span>
+            </a>
+          </div>
+
+          {/* Mobile row 2 + Desktop right: Social + eLearning + YWMN + Donate */}
+          <div className="flex items-center justify-between w-full sm:w-auto sm:justify-end gap-2 sm:gap-4">
+            {/* Social icons */}
+            <div className="flex items-center gap-1 sm:gap-2">
               {SOCIAL_LINKS.map((social, index) => (
                 <a
                   key={index}
@@ -199,10 +210,40 @@ const Navbar = () => {
                 </a>
               ))}
             </div>
-            <div className="h-4 sm:h-6 w-px bg-white/30"></div>
+
+            <div className="hidden sm:block h-6 w-px bg-white/30"></div>
+
+            {/* eLearning */}
+            <a
+              href="https://elearning.iphrdafrica.org/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 sm:gap-2 text-white/90 hover:text-white hover:bg-white/20 px-1.5 sm:px-3 py-0.5 sm:py-1 rounded-full transition-all duration-200 text-[11px] sm:text-sm font-medium whitespace-nowrap"
+              title="eLearning Portal"
+            >
+              <GraduationCap className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <span className="sm:hidden">eLearning</span>
+              <span className="hidden sm:inline">eLearning Portal</span>
+            </a>
+
+            {/* YWM Network */}
+            <a
+              href="https://ywm-network.iphrdafrica.org/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 sm:gap-2 text-white/90 hover:text-white hover:bg-white/20 px-1.5 sm:px-3 py-0.5 sm:py-1 rounded-full transition-all duration-200 text-[11px] sm:text-sm font-medium whitespace-nowrap"
+              title="Young Women Mediation Network"
+              aria-label="Young Women Mediation Network"
+            >
+              <Globe className="hidden sm:block w-4 h-4" />
+              <span className="sm:hidden">YWMN</span>
+              <span className="hidden sm:inline">YWM Network</span>
+            </a>
+
+            {/* Donate */}
             <Link
               to="/donate"
-              className="bg-yellow-500 text-green-900 px-3 sm:px-5 py-0.5 sm:py-1.5 rounded-full text-xs sm:text-sm font-bold hover:bg-yellow-400 transition-colors shadow-md whitespace-nowrap"
+              className="bg-yellow-500 text-green-900 px-2.5 sm:px-5 py-0.5 sm:py-1.5 rounded-full text-[11px] sm:text-sm font-bold hover:bg-yellow-400 transition-colors shadow-md whitespace-nowrap flex-shrink-0"
             >
               Donate
             </Link>

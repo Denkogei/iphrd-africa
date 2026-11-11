@@ -1,19 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
 import {
-  LayoutDashboard,
-  Newspaper,
-  BookOpen,
-  Briefcase,
-  Users,
-  Settings,
-  LogOut,
-  Menu,
-  Bell,
-  UserCircle,
-  Calendar,
-  Image,
-  Globe  // ← ADD THIS IMPORT
+  LayoutDashboard, Newspaper, BookOpen, Briefcase, Users,
+  Settings, LogOut, Menu, Bell, UserCircle, Calendar, Image,
+  Globe, FileText,   
 } from 'lucide-react';
 
 const AdminLayout = ({ children }) => {
@@ -29,17 +19,18 @@ const AdminLayout = ({ children }) => {
   }, []);
 
   // UPDATED MENU - Added Engagements
-  const menuItems = [
-    { name: 'Overview', icon: LayoutDashboard, path: '/admin', exact: true },
-    { name: 'News', icon: Newspaper, path: '/admin/news' },
-    { name: 'Blog', icon: BookOpen, path: '/admin/blog' },
-    { name: 'Our Events', icon: Calendar, path: '/admin/events' },
-    { name: 'Engagements', icon: Globe, path: '/admin/engagements' },  // ← ADD THIS LINE
-    { name: 'Opportunities', icon: Briefcase, path: '/admin/opportunities' },
-    { name: 'Applications', icon: Users, path: '/admin/applications' },
-    { name: 'Gallery', icon: Image, path: '/admin/gallery' },
-    { name: 'Settings', icon: Settings, path: '/admin/settings' },
-  ];
+const menuItems = [
+  { name: 'Overview',      icon: LayoutDashboard, path: '/admin',            exact: true },
+  { name: 'News',          icon: Newspaper,       path: '/admin/news' },
+  { name: 'Blog',          icon: BookOpen,        path: '/admin/blog' },
+  { name: 'Publications',  icon: FileText,        path: '/admin/publications' },  // ← NEW
+  { name: 'Our Events',    icon: Calendar,        path: '/admin/events' },
+  { name: 'Engagements',   icon: Globe,           path: '/admin/engagements' },
+  { name: 'Opportunities', icon: Briefcase,       path: '/admin/opportunities' },
+  { name: 'Applications',  icon: Users,           path: '/admin/applications' },
+  { name: 'Gallery',       icon: Image,           path: '/admin/gallery' },
+  { name: 'Settings',      icon: Settings,        path: '/admin/settings' },
+];
 
   const handleExit = () => {
     if (window.confirm('Exit Admin Panel? You will be redirected to the homepage.')) {

@@ -18,7 +18,7 @@ import Opportunities from './pages/GetInvolved/Opportunities';
 import Volunteer from './pages/GetInvolved/Volunteer';
 import Internship from './pages/GetInvolved/Internship';
 import SupportEvents from './pages/GetInvolved/SupportEvents';
-import Publications from './pages/Resources/Publications';
+// import Publications from './pages/Resources/Publications';
 import Complaints from './pages/Complaints';
 import Contacts from './pages/Contacts';
 import Donate from './pages/Donate';
@@ -36,6 +36,8 @@ import Global from './pages/Engagement/Global';
 import Regional from './pages/Engagement/Regional';
 import National from './pages/Engagement/National';
 import Community from './pages/Engagement/Community';
+import YouthPeaceIndex from './pages/Programmes/YouthPeaceIndex';
+import Publications from './pages/Publications';
 
 
 
@@ -48,11 +50,11 @@ import AdminOpportunities from './pages/Admin/AdminOpportunities';
 import AdminApplications from './pages/Admin/AdminApplications';
 import AdminBlog from './pages/Admin/AdminBlog';
 import AdminPress from './pages/Admin/AdminPress';
-import AdminReports from './pages/Admin/AdminReports';
 import AdminSettings from './pages/Admin/AdminSettings';
 import AdminGalleryManager from './pages/Admin/AdminGalleryManager';
 import AdminEvents from './pages/Admin/AdminEvents';
 import EngagementManagement from './pages/Admin/EngagementManagement';
+import AdminPublications from './pages/Admin/AdminPublications';
 
 function App() {
   const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
@@ -88,9 +90,8 @@ function App() {
         <Route path="/admin/press" element={
           isAuthenticated ? <AdminLayout><AdminPress /></AdminLayout> : <Navigate to="/login" />
         } />
-        <Route path="/admin/reports" element={
-          isAuthenticated ? <AdminLayout><AdminReports /></AdminLayout> : <Navigate to="/login" />
-        } />
+        <Route path="/admin/publications" element={ <AdminLayout> <AdminPublications /> </AdminLayout> }/>
+
         <Route path="/admin/settings" element={
           isAuthenticated ? <AdminLayout><AdminSettings /></AdminLayout> : <Navigate to="/login" />
         } />
@@ -113,6 +114,8 @@ function App() {
         <Route path="/vision-mission" element={<Layout><VisionMission /></Layout>} />
         <Route path="/team" element={<Layout><OurTeam /></Layout>} />
         <Route path="/partners" element={<Layout><OurPartners /></Layout>} />
+        <Route path="/youth-peace-index" element={<Layout><YouthPeaceIndex /></Layout>} />
+
         
         {/* Public Routes - Programmes */}
         <Route path="/scope-programmes" element={<Layout><ScopeProgrammes /></Layout>} />
@@ -146,6 +149,7 @@ function App() {
         <Route path="/complaints" element={<Layout><Complaints /></Layout>} />
         <Route path="/contacts" element={<Layout><Contacts /></Layout>} />
         <Route path="/donate" element={<Layout><Donate /></Layout>} />
+        <Route path="/publications" element={<Publications />} />
            {/* Engagement */}
         <Route path="/engagements/global" element={<Layout><Global /></Layout>} />
         <Route path="/engagements/regional" element={<Layout><Regional /></Layout>} />

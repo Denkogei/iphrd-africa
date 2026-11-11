@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Calendar, MapPin, Youtube, Globe, X, Play, Clock, Tag, ExternalLink } from 'lucide-react';
 
+const API_BASE_URL = 'https://trial.iphrdafrica.org';
+
 function Global() {
   const [engagements, setEngagements] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -14,7 +16,8 @@ function Global() {
   const fetchEngagements = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('https://trial.iphrdafrica.org/api/engagements/level/global');
+      const response = await axios.get(`${API_BASE_URL}/api/engagements/level/global`);
+      console.log('First global engagement object:', response.data[0]); // 🔍 Debug
       setEngagements(response.data);
     } catch (error) {
       console.error('Error fetching global engagements:', error);
@@ -24,7 +27,7 @@ function Global() {
   };
 
   const getStatusColor = (status) => {
-    switch(status) {
+    switch (status) {
       case 'upcoming': return 'bg-blue-100 text-blue-700 border-blue-200';
       case 'ongoing': return 'bg-green-100 text-green-700 border-green-200';
       case 'completed': return 'bg-gray-100 text-gray-700 border-gray-200';
@@ -34,14 +37,13 @@ function Global() {
   };
 
   const getStatusIcon = (status) => {
-    switch(status) {
+    switch (status) {
       case 'upcoming': return <Clock className="w-3 h-3" />;
       case 'ongoing': return <Play className="w-3 h-3" />;
       default: return null;
     }
   };
 
-  // Extract YouTube video ID from URL
   const getYouTubeId = (url) => {
     if (!url) return null;
     const patterns = [
@@ -56,38 +58,40 @@ function Global() {
     return null;
   };
 
-  // Get YouTube thumbnail
   const getYouTubeThumbnail = (url) => {
     const videoId = getYouTubeId(url);
     if (!videoId) return null;
     return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
   };
 
-  // Truncate description to 50 words
-  const truncateDescription = (text, wordLimit = 50) => {
-    if (!text) return '';
-    const words = text.split(' ');
-    if (words.length <= wordLimit) return text;
-    return words.slice(0, wordLimit).join(' ') + '...';
+  // ✅ Build a proper absolute image URL from whatever the API returns
+  const getImageUrl = (engagement) => {
+    const raw =
+      engagement.image_url ||
+      engagement.image ||
+      engagement.cover_image ||
+      engagement.thumbnail ||
+      null;
+
+    if (!raw) return null;
+
+    // Already absolute?
+    if (/^https?:\/\//i.test(raw)) return raw;
+
+    // Relative path — prepend API host
+    return `${API_BASE_URL}${raw.startsWith('/') ? '' : '/'}${raw}`;
   };
 
   const openVideoModal = (youtubeLink) => {
     const videoId = getYouTubeId(youtubeLink);
-    if (videoId) {
-      setSelectedVideo(videoId);
-    }
+    if (videoId) setSelectedVideo(videoId);
   };
 
-  const closeVideoModal = () => {
-    setSelectedVideo(null);
-  };
+  const closeVideoModal = () => setSelectedVideo(null);
 
-  // Format date
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric', month: 'long', day: 'numeric'
     });
   };
 
@@ -118,96 +122,92 @@ function Global() {
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {engagements.map((engagement) => {
-          const thumbnail = engagement.youtube_link ? getYouTubeThumbnail(engagement.youtube_link) : null;
-          const imageSrc = engagement.image_url || thumbnail || null;
-          const truncatedDescription = truncateDescription(engagement.description, 50);
-          
+          const youtubeThumb = engagement.youtube_link ? getYouTubeThumbnail(engagement.youtube_link) : null;
+          const uploadedImage = getImageUrl(engagement);
+
+          // Priority: uploaded image → YouTube thumbnail → none
+          const displayImage = uploadedImage || youtubeThumb || null;
+
           return (
-            <div 
-              key={engagement.id} 
-              className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-md hover:shadow-2xl transition-all duration-300 group transform hover:-translate-y-1"
+            <div
+              key={engagement.id}
+              className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-md hover:shadow-2xl transition-all duration-300 group transform hover:-translate-y-1 flex flex-col"
             >
-              <div className="relative h-60 bg-gray-100 cursor-pointer overflow-hidden">
-                {imageSrc ? (
-                  <div className="relative w-full h-full">
-                    <img 
-                      src={imageSrc} 
-                      alt={engagement.title} 
-                      className="w-full h-full object-cover group-hover:scale-110 transition duration-700"
+              {/* ===== IMAGE CONTAINER (fixed height, hard-clipped) ===== */}
+              <div className="relative w-full h-60 bg-gray-100 overflow-hidden flex-shrink-0">
+                {displayImage ? (
+                  <>
+                    <img
+                      src={displayImage}
+                      alt={engagement.title}
+                      className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"
+                      style={{ maxWidth: '100%', maxHeight: '100%' }}
                       onError={(e) => {
-                        if (thumbnail && e.target.src !== thumbnail) {
-                          e.target.src = thumbnail;
+                        console.error('Image failed:', displayImage);
+                        if (uploadedImage && youtubeThumb && e.target.src !== youtubeThumb) {
+                          e.target.src = youtubeThumb;
                         } else {
                           e.target.style.display = 'none';
-                          const parent = e.target.parentElement;
-                          parent.innerHTML = `
-                            <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100">
-                              <svg class="w-20 h-20 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                              </svg>
-                            </div>
-                          `;
                         }
                       }}
                     />
-                    {/* Gradient overlay for better text visibility */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
-                    
+
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none" />
+
                     {engagement.youtube_link && (
                       <>
-                        {/* Play button overlay on hover */}
-                        <div 
+                        <div
                           onClick={() => openVideoModal(engagement.youtube_link)}
-                          className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer"
+                          className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer z-10"
                         >
                           <div className="w-20 h-20 bg-red-600 rounded-full flex items-center justify-center shadow-2xl transform hover:scale-110 transition-transform">
                             <Play className="w-10 h-10 text-white ml-1" />
                           </div>
                         </div>
-                        {/* YouTube badge */}
-                        <div className="absolute bottom-4 right-4 bg-red-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-lg">
+                        <div className="absolute bottom-4 right-4 bg-red-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-lg z-10">
                           <Youtube className="w-4 h-4" />
                           YouTube
                         </div>
                       </>
                     )}
-                  </div>
+                  </>
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100">
                     <Globe className="w-20 h-20 text-blue-300" />
                   </div>
                 )}
-                
+
                 {/* Level Badge */}
-                <div className="absolute top-4 left-4 px-4 py-1.5 rounded-lg text-xs font-bold text-white bg-blue-600 shadow-lg tracking-wider">
+                <div className="absolute top-4 left-4 px-4 py-1.5 rounded-lg text-xs font-bold text-white bg-blue-600 shadow-lg tracking-wider z-10">
                   🌍 GLOBAL
                 </div>
 
                 {/* Status Badge */}
-                <div className={`absolute top-4 right-4 px-3 py-1.5 rounded-lg text-xs font-medium shadow-lg flex items-center gap-1.5 border ${getStatusColor(engagement.status)}`}>
+                <div className={`absolute top-4 right-4 px-3 py-1.5 rounded-lg text-xs font-medium shadow-lg flex items-center gap-1.5 border z-10 ${getStatusColor(engagement.status)}`}>
                   {getStatusIcon(engagement.status)}
                   {engagement.status || 'upcoming'}
                 </div>
               </div>
 
-              <div className="p-5">
+              {/* ===== CARD BODY ===== */}
+              <div className="p-5 flex flex-col flex-1">
                 <h3 className="font-bold text-gray-800 text-lg mb-2 line-clamp-2 hover:text-blue-600 transition">
                   {engagement.title}
                 </h3>
-                
-                {/* Description with 50-word limit */}
-                <p className="text-sm text-gray-500 mb-4 leading-relaxed line-clamp-3">
-                  {truncatedDescription}
+
+                {/* ✅ Full description — no JS truncation, no CSS clamp */}
+                <p className="text-sm text-gray-500 mb-4 leading-relaxed whitespace-pre-line">
+                  {engagement.description}
                 </p>
-                
-                <div className="space-y-2.5 text-sm border-t border-gray-100 pt-3">
+
+                <div className="space-y-2.5 text-sm border-t border-gray-100 pt-3 mt-auto">
                   <div className="flex items-center gap-2.5 text-gray-600">
                     <div className="p-1.5 bg-blue-50 rounded-lg">
                       <Calendar className="w-4 h-4 text-blue-500 flex-shrink-0" />
                     </div>
                     <span className="font-medium">{formatDate(engagement.event_date)}</span>
                   </div>
-                  
+
                   {engagement.location && (
                     <div className="flex items-center gap-2.5 text-gray-600">
                       <div className="p-1.5 bg-green-50 rounded-lg">
@@ -216,7 +216,7 @@ function Global() {
                       <span>{engagement.location}</span>
                     </div>
                   )}
-                  
+
                   {engagement.category && (
                     <div className="flex items-center gap-2.5 text-gray-600">
                       <div className="p-1.5 bg-blue-50 rounded-lg">
@@ -255,11 +255,10 @@ function Global() {
         })}
       </div>
 
-      {/* Video Modal */}
+      {/* ===== VIDEO MODAL ===== */}
       {selectedVideo && (
         <div className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4" onClick={closeVideoModal}>
           <div className="relative w-full max-w-5xl" onClick={(e) => e.stopPropagation()}>
-            {/* Close button */}
             <button
               onClick={closeVideoModal}
               className="absolute -top-14 right-0 text-white hover:text-gray-300 transition flex items-center gap-2"
@@ -267,8 +266,7 @@ function Global() {
               <span className="text-sm font-medium">Close</span>
               <X className="w-6 h-6" />
             </button>
-            
-            {/* Video Player */}
+
             <div className="relative pt-[56.25%] bg-black rounded-2xl overflow-hidden shadow-2xl">
               <iframe
                 src={`https://www.youtube.com/embed/${selectedVideo}?autoplay=1&rel=0&modestbranding=1&showinfo=0`}
@@ -278,7 +276,7 @@ function Global() {
                 className="absolute top-0 left-0 w-full h-full"
               />
             </div>
-            
+
             <div className="flex justify-center items-center gap-6 mt-4 text-white/60 text-sm">
               <span>Press <kbd className="px-2 py-1 bg-white/10 rounded text-xs">ESC</kbd> to close</span>
               <span>or click outside</span>

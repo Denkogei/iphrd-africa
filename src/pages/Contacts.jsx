@@ -101,7 +101,7 @@ const Contacts = () => {
                   <div className="text-[#2E7D32] text-xl">📍</div>
                   <div>
                     <h3 className="font-semibold text-gray-800">Address</h3>
-                    <p className="text-gray-600">IPHRD-Africa<br />Nairobi, Kenya<br />Elysee plaza, 3rd floor, Kilimani Road</p>
+                    <p className="text-gray-600">IPHRD-Africa<br />Nairobi, Kenya<br />Elysee plaza, 2nd floor, Kilimani Road</p>
                   </div>
                 </div>
                 <div className="flex items-start space-x-3">

@@ -1,12 +1,10 @@
-// Remove unused Link import
-// import { Link } from 'react-router-dom';
-
 // Corrected import paths - make sure these files exist
 import ncaLogo from '../../assets/images/partners/nca.png';
 import gizLogo from '../../assets/images/partners/giz.jpg';
 import fecclahaLogo from '../../assets/images/partners/FECCLAHA.png';
 import clingendealLogo from '../../assets/images/partners/clingendael.png';
 import IIP from '../../assets/images/partners/IIP.jpg';
+import activecitizen from '../../assets/images/partners/activecitizen.jpeg';
 
 const OurPartners = () => {
   const partners = [
@@ -39,6 +37,11 @@ const OurPartners = () => {
       image: IIP, 
       placeholder: "🌍",
       website: "https://www.initiativeforinclusivepeace.org/"
+    },
+    { 
+      name: "Active Citizen", 
+      image: activecitizen, 
+      placeholder: "🤝",
     }
   ];
 
@@ -66,7 +69,7 @@ const OurPartners = () => {
         </div>
       </section>
 
-      {/* Partners Grid - Single Row with all 5 partners */}
+      {/* Partners Grid - Responsive */}
       <section className="bg-gray-50 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -81,23 +84,22 @@ const OurPartners = () => {
             </p>
           </div>
           
-          {/* Changed to grid-cols-5 for 5 items in a single row */}
-          <div className="grid grid-cols-5 gap-6">
+          {/* Responsive grid: 2 on mobile, 3 on tablet, 6 on desktop */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 sm:gap-4 md:gap-6">
             {partners.map((partner, index) => (
               <a 
                 key={index}
-                href={partner.website}
+                href={partner.website || "#"}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-all text-center cursor-pointer hover:-translate-y-1"
+                className="group bg-white p-3 sm:p-4 md:p-6 rounded-xl shadow-md hover:shadow-xl transition-all text-center cursor-pointer hover:-translate-y-1"
               >
-                {/* Removed grayscale class to keep original colors */}
-                <div className="h-24 flex items-center justify-center mb-3 transition duration-300">
+                <div className="h-20 sm:h-24 flex items-center justify-center mb-3 transition duration-300">
                   {partner.image ? (
                     <img 
                       src={partner.image}
                       alt={partner.name}
-                      className="max-h-20 max-w-full object-contain"
+                      className="max-h-16 sm:max-h-20 max-w-full object-contain"
                       onError={(e) => {
                         e.target.onerror = null;
                         e.target.style.display = 'none';
@@ -105,16 +107,18 @@ const OurPartners = () => {
                         if (parent && !parent.querySelector('.placeholder-icon')) {
                           const span = document.createElement('span');
                           span.className = 'text-4xl placeholder-icon';
-                          span.textContent = partner.placeholder;
+                          span.textContent = partner.placeholder || '🤝';
                           parent.appendChild(span);
                         }
                       }}
                     />
                   ) : (
-                    <span className="text-4xl">{partner.placeholder}</span>
+                    <span className="text-4xl">{partner.placeholder || '🤝'}</span>
                   )}
                 </div>
-                <p className="font-semibold text-gray-800 text-sm group-hover:text-iphrd-green transition">{partner.name}</p>
+                <p className="font-semibold text-gray-800 text-xs sm:text-sm group-hover:text-iphrd-green transition leading-snug">
+                  {partner.name}
+                </p>
               </a>
             ))}
           </div>

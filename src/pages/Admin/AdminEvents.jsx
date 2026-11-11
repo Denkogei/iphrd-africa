@@ -173,21 +173,22 @@ function AdminEvents() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSubmitting(true);
+  e.preventDefault();
+  setSubmitting(true);
 
-    let dateDisplay = formData.date_display;
-    if (!dateDisplay && formData.start_date) {
-      dateDisplay = generateDateDisplay(
-        formData.start_date, 
-        formData.end_date, 
-        formData.is_multi_day
-      );
-    }
+  let dateDisplay = formData.date_display;
+  if (!dateDisplay && formData.start_date) {
+    dateDisplay = generateDateDisplay(
+      formData.start_date, 
+      formData.end_date, 
+      formData.is_multi_day
+    );
+  }
 
     const formDataToSend = new FormData();
     formDataToSend.append('title', formData.title);
     formDataToSend.append('description', formData.description);
+    formDataToSend.append('event_date', formData.start_date);
     formDataToSend.append('start_date', formData.start_date);
     formDataToSend.append('end_date', formData.end_date || formData.start_date);
     formDataToSend.append('is_multi_day', formData.is_multi_day);

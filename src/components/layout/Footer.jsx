@@ -50,7 +50,7 @@ const Footer = () => {
             <ul className="space-y-2 text-white/90 text-sm mb-4">
               <li className="flex items-center gap-2">
                 <span>📍</span>
-                <span>Elysee plaza, 3rd floor, Kilimani Road</span>
+                <span>Elysee plaza, 2nd floor, Kilimani Road</span>
               </li>
               <li className="flex items-center gap-2">
                 <span>📧</span>

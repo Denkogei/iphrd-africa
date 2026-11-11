@@ -86,7 +86,7 @@ const teamMembers = [
     image: carlosImage,
     name: "Carlos Kipchumba",
     position: "Programs Officer",
-    bio: "Development professional focused on gender equality, human rights, peacebuilding, and youth empowerment. Passionate about supporting inclusive communities and strengthening locally driven approaches to peace, development, and social justice across Africa"
+    bio: "Development professional focused on gender equality, human rights, peacebuilding, and youth empowerment. Passionate about supporting inclusive communities and strengthening locally driven approaches to peace, development, and social justice."
   }
 ];
 

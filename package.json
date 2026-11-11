@@ -2,8 +2,7 @@
   "name": "iphrd-africa",
   "version": "0.1.0",
   "private": true,
-  "proxy": "https://trial.iphrdafrica.org", 
-   "proxy": "http://217.20.124.84",
+  "proxy": "http://217.20.124.84",
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
     "@testing-library/dom": "^10.4.1",
