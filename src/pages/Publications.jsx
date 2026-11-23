@@ -8,8 +8,43 @@ import axios from 'axios';
 
 const API = 'https://trial.iphrdafrica.org/api';
 
+const VIEWS_KEY = 'publication_views';
+
+// Cooldown (ms) — a publication can only be counted once per window.
+// Set to Infinity if you only ever want the FIRST view counted.
+const VIEW_COOLDOWN_MS = 30 * 1000;
+
 const getFullUrl = (url) =>
   !url ? null : url.startsWith('http') ? url : `https://trial.iphrdafrica.org${url}`;
+
+// ---- localStorage view-tracking helpers ----
+const getMap = (key) => {
+  try { return JSON.parse(localStorage.getItem(key)) || {}; }
+  catch { return {}; }
+};
+
+// Returns { counted, count } — respects cooldown
+const tryIncrementView = (id) => {
+  const map = getMap(VIEWS_KEY);
+  const now = Date.now();
+  const entry = map[id];
+  const last = entry && typeof entry === 'object' ? entry.last || 0 : 0;
+  const count = entry && typeof entry === 'object' ? entry.count || 0 : (entry || 0);
+
+  if (now - last < VIEW_COOLDOWN_MS) return { counted: false, count };
+
+  const next = { count: count + 1, last: now };
+  map[id] = next;
+  try { localStorage.setItem(VIEWS_KEY, JSON.stringify(map)); } catch {}
+  return { counted: true, count: next.count };
+};
+
+// Read a count regardless of old (number) or new ({count,last}) shape
+const getViewCount = (id) => {
+  const entry = getMap(VIEWS_KEY)[id];
+  if (entry && typeof entry === 'object') return entry.count || 0;
+  return typeof entry === 'number' ? entry : 0;
+};
 
 const Publications = () => {
   const [items, setItems] = useState([]);
@@ -19,6 +54,7 @@ const Publications = () => {
   const [activeYear, setActiveYear] = useState('All');
   const [sortBy, setSortBy] = useState('newest');
   const [preview, setPreview] = useState(null);
+  const [viewsMap, setViewsMap] = useState(() => getMap(VIEWS_KEY));
 
   useEffect(() => {
     (async () => {
@@ -62,15 +98,24 @@ const Publications = () => {
     return () => { document.body.style.overflow = 'auto'; };
   }, [preview]);
 
+  const handleView = (pub) => {
+    tryIncrementView(pub.id);
+    setViewsMap(getMap(VIEWS_KEY));
+    setPreview(pub);
+  };
+
+  const label = (n, singular) => `${n} ${singular}${n === 1 ? '' : 's'}`;
+
   return (
-    <div className="bg-gray-50 min-h-screen">
-      {/* ============ HERO — green only ============ */}
-      <section className="bg-iphrd-green text-white">
+    <div className="min-h-screen bg-gray-50 overflow-x-hidden">
+      <section className="bg-iphrd-green text-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
-          <div className="max-w-2xl">
-            <h1 className="text-3xl md:text-4xl font-bold mb-3">Publications</h1>
+          <div>
+            <h1 className="text-3xl md:text-4xl font-bold mb-3 break-words">
+              Publications
+            </h1>
             <p className="text-base md:text-lg text-white/85">
-              Magazines, reports, and resources from our work across Africa.
+              Magazines, reports, situational awareness and resources from our work across Africa.
             </p>
           </div>
         </div>
@@ -80,7 +125,7 @@ const Publications = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-5">
         <div className="bg-white rounded-xl shadow-md border border-gray-100 p-3 sm:p-4">
           <div className="flex flex-col sm:flex-row gap-2.5">
-            <div className="relative flex-1">
+            <div className="relative flex-1 min-w-0">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
                 type="text"
@@ -100,7 +145,7 @@ const Publications = () => {
               )}
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <div className="relative">
                 <select
                   value={activeYear}
@@ -176,57 +221,67 @@ const Publications = () => {
         {/* ============ COMPACT GRID ============ */}
         {!loading && !error && filtered.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {filtered.map((pub) => (
-              <article
-                key={pub.id}
-                className="group bg-white rounded-lg border border-gray-200 overflow-hidden hover:border-iphrd-green/40 hover:shadow-lg transition-all duration-200 flex flex-col"
-              >
-                {/* Compact header strip — solid green */}
-                <div className="relative h-24 bg-iphrd-green flex items-center justify-center">
-                  <FileText className="w-8 h-8 text-white/90" strokeWidth={1.75} />
-                  {pub.year && (
-                    <span className="absolute top-2 right-2 text-[10px] font-bold uppercase tracking-wide bg-white/20 backdrop-blur text-white px-2 py-0.5 rounded-full ring-1 ring-white/30">
-                      {pub.year}
-                    </span>
-                  )}
-                </div>
+            {filtered.map((pub) => {
+              const views = viewsMap[pub.id]?.count ?? getViewCount(pub.id);
 
-                {/* Body */}
-                <div className="p-4 flex flex-col flex-1">
-                  <h3 className="text-sm font-bold text-gray-900 leading-snug mb-1.5 line-clamp-2 group-hover:text-iphrd-green transition-colors">
-                    {pub.title}
-                  </h3>
-                  <p className="text-xs text-gray-600 leading-relaxed line-clamp-2 flex-1 mb-3">
-                    {pub.description}
-                  </p>
-
-                  <div className="flex items-center gap-1 text-[11px] text-gray-500 mb-3">
-                    <Calendar className="w-3 h-3" />
-                    {new Date(pub.date_posted).toLocaleDateString('en-US', {
-                      month: 'short', day: 'numeric', year: 'numeric',
-                    })}
+              return (
+                <article
+                  key={pub.id}
+                  className="group bg-white rounded-lg border border-gray-200 overflow-hidden hover:border-iphrd-green/40 hover:shadow-lg transition-all duration-200 flex flex-col min-w-0"
+                >
+                  {/* Compact header strip — solid green */}
+                  <div className="relative h-24 bg-iphrd-green flex items-center justify-center">
+                    <FileText className="w-8 h-8 text-white/90" strokeWidth={1.75} />
+                    {pub.year && (
+                      <span className="absolute top-2 right-2 text-[10px] font-bold uppercase tracking-wide bg-white/20 backdrop-blur text-white px-2 py-0.5 rounded-full ring-1 ring-white/30">
+                        {pub.year}
+                      </span>
+                    )}
                   </div>
 
-                  <div className="flex gap-1.5 pt-3 border-t border-gray-100">
-                    <button
-                      onClick={() => setPreview(pub)}
-                      className="flex-1 inline-flex items-center justify-center gap-1 text-xs font-semibold text-gray-700 hover:text-iphrd-green hover:bg-iphrd-green/5 px-2 py-1.5 rounded-md transition"
-                    >
-                      <Eye className="w-3.5 h-3.5" />
-                      View
-                    </button>
-                    <a
-                      href={getFullUrl(pub.file_url)}
-                      download
-                      className="flex-1 inline-flex items-center justify-center gap-1 text-xs font-semibold bg-iphrd-green hover:bg-iphrd-green/90 text-white px-2 py-1.5 rounded-md transition"
-                    >
-                      <Download className="w-3.5 h-3.5" />
-                      Download
-                    </a>
+                  {/* Body */}
+                  <div className="p-4 flex flex-col flex-1 min-w-0">
+                    <h3 className="text-sm font-bold text-gray-900 leading-snug mb-1.5 line-clamp-2 group-hover:text-iphrd-green transition-colors break-words">
+                      {pub.title}
+                    </h3>
+                    <p className="text-xs text-gray-600 leading-relaxed line-clamp-2 flex-1 mb-3 break-words">
+                      {pub.description}
+                    </p>
+
+                    <div className="flex items-center gap-2 text-[11px] text-gray-500 mb-3 flex-wrap">
+                      <span className="flex items-center gap-1">
+                        <Calendar className="w-3 h-3" />
+                        {new Date(pub.date_posted).toLocaleDateString('en-US', {
+                          month: 'short', day: 'numeric', year: 'numeric',
+                        })}
+                      </span>
+                      <span className="flex items-center gap-1 text-gray-500">
+                        <Eye className="w-3 h-3" />
+                        {label(views, 'view')}
+                      </span>
+                    </div>
+
+                    <div className="flex gap-1.5 pt-3 border-t border-gray-100">
+                      <button
+                        onClick={() => handleView(pub)}
+                        className="flex-1 min-w-0 inline-flex items-center justify-center gap-1 text-xs font-semibold text-gray-700 hover:text-iphrd-green hover:bg-iphrd-green/5 px-2 py-1.5 rounded-md transition"
+                      >
+                        <Eye className="w-3.5 h-3.5 flex-shrink-0" />
+                        View
+                      </button>
+                      <a
+                        href={getFullUrl(pub.file_url)}
+                        download
+                        className="flex-1 min-w-0 inline-flex items-center justify-center gap-1 text-xs font-semibold bg-iphrd-green hover:bg-iphrd-green/90 text-white px-2 py-1.5 rounded-md transition"
+                      >
+                        <Download className="w-3.5 h-3.5 flex-shrink-0" />
+                        Download
+                      </a>
+                    </div>
                   </div>
-                </div>
-              </article>
-            ))}
+                </article>
+              );
+            })}
           </div>
         )}
       </div>

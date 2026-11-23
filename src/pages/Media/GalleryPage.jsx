@@ -160,7 +160,7 @@ const GalleryPage = () => {
           Gallery
           </h1>
           <p className="text-xl md:text-2xl text-white/90 max-w-2xl mx-auto">
-            Explore moments captured from ourand activities
+            Explore moments captured from our activities
           </p>
           
           {events.length > 0 && (

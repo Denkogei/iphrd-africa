@@ -24,6 +24,74 @@ import Navbar from '../../components/layout/Navbar';
 
 const API_BASE_URL = 'https://trial.iphrdafrica.org';
 
+/**
+ * Renders plain text with:
+ *  - URLs (http/https/www) as clickable links (open in new tab)
+ *  - #hashtags as styled spans (clickable if onHashtagClick provided)
+ * Preserves line breaks; relies on `whitespace-pre-line` on wrapper.
+ */
+const renderDescriptionWithLinks = (text, { onHashtagClick } = {}) => {
+  if (!text) return null;
+
+  const combinedRegex = /(https?:\/\/[^\s]+|www\.[^\s]+|#\w+)/g;
+  const parts = [];
+  let lastIndex = 0;
+  let match;
+
+  while ((match = combinedRegex.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push({ type: 'text', content: text.slice(lastIndex, match.index) });
+    }
+
+    const token = match[0];
+
+    if (token.startsWith('#')) {
+      parts.push({ type: 'hashtag', content: token, tag: token.substring(1) });
+    } else {
+      const href = token.startsWith('http') ? token : `https://${token}`;
+      parts.push({ type: 'link', content: token, href });
+    }
+
+    lastIndex = combinedRegex.lastIndex;
+  }
+
+  if (lastIndex < text.length) {
+    parts.push({ type: 'text', content: text.slice(lastIndex) });
+  }
+
+  return (
+    <>
+      {parts.map((part, index) => {
+        if (part.type === 'link') {
+          return (
+            <a
+              key={index}
+              href={part.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-iphrd-blue-600 hover:text-iphrd-blue-700 underline break-all"
+            >
+              {part.content}
+            </a>
+          );
+        }
+        if (part.type === 'hashtag') {
+          return (
+            <span
+              key={index}
+              className="text-iphrd-blue-600 font-medium hover:text-iphrd-blue-700 cursor-pointer"
+              onClick={() => onHashtagClick && onHashtagClick(part.tag)}
+            >
+              {part.content}
+            </span>
+          );
+        }
+        return <span key={index}>{part.content}</span>;
+      })}
+    </>
+  );
+};
+
 const EventDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -102,37 +170,30 @@ const EventDetail = () => {
     }
   };
 
-  // Format date - handles both single and multi-day events
   const formatEventDate = (event) => {
     if (!event) return 'Date TBD';
     
-    // If date_display exists from backend, use it
     if (event.date_display) {
       return event.date_display;
     }
     
-    // Check for multi-day event using start_date and end_date
     if (event.start_date && event.end_date && event.start_date !== event.end_date) {
       const start = new Date(event.start_date);
       const end = new Date(event.end_date);
       
-      // Check if it's the same month
       if (start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear()) {
-        // Same month: "Jul 27-28, 2026"
         const month = start.toLocaleDateString('en-US', { month: 'short' });
         const day1 = start.getDate();
         const day2 = end.getDate();
         const year = start.getFullYear();
         return `${month} ${day1}-${day2}, ${year}`;
       } else {
-        // Different months: "Jul 27 - Aug 2, 2026"
         const startStr = start.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
         const endStr = end.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
         return `${startStr} - ${endStr}`;
       }
     }
     
-    // Single day event - use start_date or fallback to event_date
     const dateString = event.start_date || event.event_date;
     if (!dateString) return 'Date TBD';
     
@@ -143,11 +204,9 @@ const EventDetail = () => {
     });
   };
 
-  // Get detailed date display for the sidebar
   const getDetailedDateDisplay = (event) => {
     if (!event) return 'Date TBD';
     
-    // If date_display exists, use it
     if (event.date_display) {
       return event.date_display;
     }
@@ -181,7 +240,6 @@ const EventDetail = () => {
     });
   };
 
-  // Check if event is upcoming
   const isUpcoming = (event) => {
     const dateString = event.start_date || event.event_date;
     if (!dateString) return false;
@@ -192,7 +250,6 @@ const EventDetail = () => {
     return eventDate >= today;
   };
 
-  // Get the correct image URL
   const getImageUrl = (event) => {
     if (!event || !event.image) return null;
     if (event.image.startsWith('http')) return event.image;
@@ -209,6 +266,11 @@ const EventDetail = () => {
 
   const handleBack = () => {
     navigate('/media/our-events');
+  };
+
+  // Optional: navigate to filtered list on hashtag click
+  const handleHashtagClick = (tag) => {
+    navigate(`/media/our-events?tag=${encodeURIComponent(tag)}`);
   };
 
   if (loading) {
@@ -289,7 +351,6 @@ const EventDetail = () => {
                     const fallback = document.createElement('div');
                     fallback.className = 'w-full h-full flex flex-col items-center justify-center opacity-30';
                     fallback.innerHTML = `
-                      ${getEventTypeIcon(event.event_type).type}
                       <span class="mt-2 text-white text-xl font-medium">${getEventTypeLabel(event.event_type)}</span>
                     `;
                     parent.appendChild(fallback);
@@ -340,10 +401,12 @@ const EventDetail = () => {
                 <div className="md:col-span-2 space-y-6">
                   <div>
                     <h2 className="text-lg font-semibold text-gray-800 mb-2">About This Event</h2>
-                    {/* Added text-justify here */}
-                    <p className="text-gray-600 leading-relaxed whitespace-pre-line text-justify">
-                      {event.description}
-                    </p>
+                    {/* ✅ Rich description: links + hashtags rendered */}
+                    <div className="text-gray-600 leading-relaxed whitespace-pre-line text-justify">
+                      {renderDescriptionWithLinks(event.description, {
+                        onHashtagClick: handleHashtagClick,
+                      })}
+                    </div>
                   </div>
 
                   <div>
