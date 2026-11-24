@@ -12,6 +12,58 @@ import {
 const API = 'https://trial.iphrdafrica.org';
 const getFullUrl = (url) => (!url ? null : url.startsWith('http') ? url : `${API}${url}`);
 
+// --- CSV helpers (frontend-only export) ---
+const csvEscape = (val) => {
+  if (val === null || val === undefined) return '';
+  const s = String(val);
+  return `"${s.replace(/"/g, '""')}"`;
+};
+
+const buildApplicationsCSV = (apps) => {
+  const headers = [
+    'Application #',
+    'Full Name',
+    'Email',
+    'Phone',
+    'Position / Opportunity',
+    'Application Type',
+    'Date Applied',
+    'Status',
+    'CV URL',
+    'Cover Letter',
+  ];
+
+  const rows = apps.map((a) => [
+    a.id,
+    a.full_name,
+    a.email,
+    a.phone || '',
+    a.opportunity_title || 'General Application',
+    a.application_type || '',
+    a.date_applied ? new Date(a.date_applied).toLocaleString() : '',
+    a.status || 'pending',
+    getFullUrl(a.cv_url) || '',
+    a.cover_letter || '',
+  ]);
+
+  return [headers, ...rows]
+    .map((row) => row.map(csvEscape).join(','))
+    .join('\r\n');
+};
+
+const downloadCSV = (csv, filename) => {
+  // BOM keeps Excel happy with UTF-8 (accented names, apostrophes, etc.)
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+};
+
 const STATUS_STYLES = {
   pending:     'bg-yellow-100 text-yellow-700 border-yellow-200',
   reviewed:    'bg-blue-100 text-blue-700 border-blue-200',
@@ -145,6 +197,35 @@ function AdminApplications() {
     }
   };
 
+  // ===== CSV EXPORT =====
+  const handleExportCSV = () => {
+    if (filtered.length === 0) {
+      toast.info('No applications to export');
+      return;
+    }
+    try {
+      const csv = buildApplicationsCSV(filtered);
+      const stamp = new Date().toISOString().slice(0, 10);
+      downloadCSV(csv, `applications-${stamp}.csv`);
+      toast.success(`Exported ${filtered.length} application(s)`);
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to export CSV');
+    }
+  };
+
+  const handleExportOne = (item) => {
+    if (!item) return;
+    try {
+      const csv = buildApplicationsCSV([item]);
+      downloadCSV(csv, `application-${item.id}.csv`);
+      toast.success('Exported application');
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to export');
+    }
+  };
+
   const filtered = useMemo(() =>
     items.filter((a) => {
       const q = searchTerm.toLowerCase();
@@ -168,7 +249,17 @@ function AdminApplications() {
           <h1 className="text-2xl font-bold text-gray-800">Applications Management</h1>
           <p className="text-sm text-gray-500">Review applicant details, CVs, cover letters, and notes.</p>
         </div>
-        <span className="text-sm text-gray-500">{filtered.length} of {items.length}</span>
+        <div className="flex items-center gap-3">
+          <span className="text-sm text-gray-500">{filtered.length} of {items.length}</span>
+          <button
+            onClick={handleExportCSV}
+            disabled={loading || filtered.length === 0}
+            className="inline-flex items-center gap-2 px-3 py-2 text-sm bg-iphrd-green text-white rounded-lg hover:bg-iphrd-green/90 disabled:opacity-50"
+            title="Export the applications shown below as a CSV file"
+          >
+            <Download className="w-4 h-4" /> Export CSV
+          </button>
+        </div>
       </div>
 
       <div className="bg-white rounded-lg border border-gray-100 p-3 mb-6 flex flex-col sm:flex-row gap-3">
@@ -411,7 +502,14 @@ function AdminApplications() {
                 )}
               </Section>
 
-              <div className="flex justify-end pt-2 border-t">
+              <div className="flex justify-between items-center gap-2 pt-2 border-t">
+                <button
+                  onClick={() => handleExportOne(selectedItem)}
+                  className="inline-flex items-center gap-2 px-3 py-2 text-sm text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50"
+                  title="Export this application as a CSV"
+                >
+                  <Download className="w-4 h-4" /> Export this
+                </button>
                 <button
                   onClick={() => setDeleteId(selectedItem.id)}
                   className="inline-flex items-center gap-2 px-3 py-2 text-sm text-red-600 border border-red-200 rounded-lg hover:bg-red-50"
